@@ -1,0 +1,27 @@
+\section{Preliminaries}
+Let $G = (V,E)$ denote a directed graph, with $n = |V|$ nodes and $m = |E|$ edges. We consider an SIR process \ref{} on $G$: given a seed set $S \subset V$ of infected nodes, the infection spreads from each infected node $u$ to each uninfected neighbor $v\in N(u)$ with probability $p(u,v)$. Let $\sigma(S)$ denote the \emph{spread}; that is, the expected number of infections starting with the seed set $S$.
+
+\noindent
+\textbf{Influence maximization.}
+In the Influence Maximization problem (\infmax) \cite{kempe:sigkdd03}, the goal is to find a set of $k$ nodes to infect, such that the spread is maximized.
+
+%\begin{problem}{Influence Maximization (InfMax).}
+Given a directed graph $G = (V,E)$, edge probabilities $p(u,v)$ for every edge $e=(u,v) \in E$, and a size parameter $k$, we define $\einf(S, G)$ as the expected influence in $G$ with set $S$ as the seed set. The goal of the \infmax{} problem is to find a set of seed nodes $S \subseteq V$ of size at most $k$ with maximal spread:
+$$
+S = \argmax_{S' \subset V: |S'| \leq k} \einf(S).
+$$
+
+
+Influence maximization is an instance of submodular function maximization with connectivity constraints $\ldots$ . It can be solved using the greedy algorithm.
+
+One way to estimate the spread of a set is by sampling live graphs $\ldots$. Then, InfMax can be posed as 
+
+\noindent
+\textbf{Connectivity constraints.}
+Notice that the seed set $S$ may contain nodes from any part of the graph---in particular, the nodes need not be neighbors of each other. In fact, it is usually favorable to choose nodes that are ``far apart'' so as to cover as much of the network as possible. We consider the version of the problem with a connectivity constraint on the seed set.
+
+\begin{problem}{Connected Influence Maximization (\prob{}).}
+Given a directed graph $G = (V,E)$, edge probabilities $p(u,v)$ for every edge $e=(u,v) \in E$, and a size parameter $k$, we want to find a set of seed nodes $S \subseteq V$, such that $S$ has size at most $k$, $S$ induces a connected subgraph in $G$, and $S$ has maximal spread $\einf(S, G)$.
+\end{problem}
+
+The connectivity constraint has a strong effect on the complexity of InfMax. A solution computed for InfMax using the greedy algorithm of \cite{kempe:sigkdd03} can be arbitrarily suboptimal for the problems we propose. Informally, this follows because in InfMax, it is better to choose the set of seeds to be located far apart, so that their combined influence is maximized.

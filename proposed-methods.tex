@@ -1,0 +1,227 @@
+\section{Proposed Methods}
+Our algorithm is based on the Group Steiner Tree problem \cite{reich1989beyond, garg:ja00}, and it and involves the following steps:
+\begin{enumerate}
+\item
+Sample $G_i=(V, E_i)$ subgraphs of $G$, $i=1,\ldots,N'$, where $N'=O(n^2)$, where each $E_i$ is obtained
+by picking each edge $e\in E$ independently with probability $p$. Let $\G=\{G_1,\ldots,G_{N'}\}$ denote the set of samples.
+\item
+Let $\comp(G_i)$ denote the set of connected components in $G_i$
+\item
+Let $\comp=\cup_i \comp(G_i)$ denote the set of all the components, considered as a multiset
+\item
+We solve the following variant of the Group Steiner Tree problem, which we call max cover GST: find a tree $T$ in $G$ with
+$|T|\leq k$ such that $\sum_{C\in\comp, C\cap T\neq\phi} |C|$ is maximized
+\begin{enumerate}
+\item
+As in \cite{garg:ja00}, we sample a tree $H$ from a tree metric on $G$, and run the Max cover GST algorithm
+in Section \ref{sec:max-cover-gst} to find a tree $T$ in $H$. We transform $T$ to a tree $T'$ in $G$,
+with polylog increase in cost
+\end{enumerate}
+\end{enumerate}
+
+For a sampled graph $G_i$, let $\inf(T, G_i)=\sum_{C\in \comp(G_i), C\cap T\neq\emptyset} |C|$. Let $\sinf(T, \G)=\frac{1}{N'}\sum_i \inf(T, G_i)$.
+
+\begin{lemma}
+\label{lemma:conc}
+If $N'\geq 3n^2/\epsilon^2$, for every set $S\subseteq V$, we have 
+\[
+\sinf(S, \G)\in[(1-\epsilon)\einf(S,G), (1+\epsilon)\einf(S, G)],
+\]
+with high probability.
+\end{lemma}
+\begin{proof}
+By definition, we have $\einf(S, G)=E[\inf(S, G_i)]$, where the expectation is over the sampled graphs $G_i\in\G$. We have
+\[
+N'\frac{\sinf(S,\G)}{n} = \sum_{i=1}^{N'} \frac{\inf(S, G_i)}{n}
+\]
+
+Further, for any $S\neq\emptyset$, we have $\frac{\inf(S, G_i)}{n}\in [\frac{1}{n}, 1]$. By the Chernoff bound, we have
+\begin{eqnarray*}
+\Pr[N'\cdot\sinf(S,\G)\not\in[(1-\epsilon)N'\cdot\einf(S, G), (1+\epsilon)N'\cdot\einf(S, G)]] &\leq& 2 exp(-\frac{N'\cdot\einf(S, G)\epsilon^2}{3n})\\
+&\leq& 2 exp(-n\cdot\einf(S, G))\\
+&\leq& 2 e^{-n},
+\end{eqnarray*}
+since $N'\geq 3n^2/\epsilon^2$ and $\einf(S, G)\geq 1$, if $S\neq\emptyset$.
+
+Since the number of non-empty sets $S$ is $2^n-1$, the probability that there exists any set $S$ satisfying the above condition is at most $2\cdot 2^n \cdot e^{-n}\leq 1/(e/2)^{n-1}$.
+\end{proof}
+
+Let $\hat{T}=\text{argmax}_T \sinf(T,\G)$ 
+be an optimal solution for the sampled set $\G$, and let $T^*=\text{argmax}_T \einf(T, G)$ be an optimal solution with the maximum expected influence.
+
+\begin{lemma}
+\label{lemma:saa}
+Suppose $T$ is a solution satisfying 
+$\sinf(T, \G)\geq \alpha\cdot \sinf(\hat{T}, \G)$. Then
+$\einf(T)\geq\frac{1-\epsilon}{1+\epsilon}\alpha\cdot\einf(T^*)$, with high probability, where $\G$ is the set of $N$ sampled subgraphs.
+\end{lemma}
+\begin{proof}
+With high probability, we have
+\begin{eqnarray*}
+\einf(T, G) &\geq& \frac{1}{1+\epsilon}\sinf(T,\G) \mbox{, by Lemma \ref{lemma:conc}}\\
+&\geq& \frac{\alpha}{1+\epsilon} \sinf(\hat{T}, G)\\
+&\geq& \frac{\alpha}{1+\epsilon} \sinf(T^*, G) \mbox{, by definition of $\hat{T}$}\\
+&\geq& \alpha\frac{1-\epsilon}{1+\epsilon}\einf(T^*,G) \mbox{, by Lemma \ref{lemma:conc}}
+\end{eqnarray*}
+
+\end{proof}
+
+\subsection{Max cover GST}
+\label{sec:max-cover-gst}
+
+Let $H=(V, E)$ be a tree rooted at node $r$, which is constructed using a tree  embedding corresponding to $G$. Let $\G=\{G_1,\ldots,G_{N'}\}$ denote a set of $N'$ sampled subgraphs, as before, and let $\comp=\{C_1,\ldots,C_N\}$ be a multi-set of components from the sampled subgraphs $G_i\in\G$. 
+Following earlier definitions, $\sinf(T,\G)=\frac{1}{N'}\sum_{C\in\comp, C\cap T\neq\emptyset} |C|$.
+Let $\hat{T}$ and $T^*$ be as in Lemma \ref{lemma:saa}, and let 
+$OPT=\sinf(\hat{T},\G)$. 
+Let $\compl = \{C\in\comp: |C|\in[2^{\ell}, 2^{\ell+1})\}$.
+Let $OPT^{(\ell)}=\frac{1}{N'}\sum_{C\in\compl, C\cap T\neq\emptyset} |C|$
+
+We consider the following sub-problem here.
+
+\noindent
+\textbf{Problem.}
+The objective is to find a tree $T$ in $H$ such that
+\begin{eqnarray*}
+|T| &\leq& k\\
+\sum_{C\in\comp, C\cap T\neq\phi} |C| &=& OPT \mbox{ is maximized}
+\end{eqnarray*}
+
+We consider the following linear program, denoted by $LP_1^{(\ell)}$:
+
+\begin{eqnarray}
+\nonumber
+\max  \sum_{C\in\compl} |C|y_C  && \\
+\forall S\ni r: \sum_{e\in\delta(S)} x_e &\geq& \min\{1, \sum_{C\subseteq V-S, C\in\compl} y_C\}\\
+\sum_e x_e &\leq& k\\
+\sum_{C\in\compl} y_C &\geq& 1\\
+x_e, y_C &\in& [0, 1]
+\end{eqnarray}
+
+\begin{lemma}
+\label{lemma:lp-approx}
+There exists $\ell\in\{1,\ldots,\log{n}\}$ such that the objective value of $LP_1^{(\ell)}$ is at least $OPT/\log{n}$.
+\end{lemma}
+\begin{proof}
+Consider the following IP:
+\begin{eqnarray*}
+\nonumber
+\max  \sum_{C\in\comp} |C|y_C  && \\
+\forall S\ni r: \sum_{e\in\delta(S)} x_e &\geq& \min\{1, \sum_{C\subseteq V-S, C\in\comp} y_C\}\\
+\sum_e x_e &\leq& k\\
+\sum_C y_C &\geq& 1\\
+x_e, y_C &\in& \{0, 1\}
+\end{eqnarray*}
+
+The above program is feasible. Let $x^*, y^*$ be an optimal integral solution to the above IP.
+Then, $\sum_C |C|y^*_C\geq OPT$.
+
+Next, $\sum_{C\in\comp} |C|y^*_C=\sum_{\ell}\sum_{C\in\compl} |C|y^*_C$. Therefore, there exists $\ell$ such that
+$\sum_{C\in\compl} |C|y^*_C\geq OPT/\log{n}$. Futher, there exists $C\in\compl$ such that $y^*_C=1$
+(else $\sum_{C\in\compl} |C|y^*_C=0$).
+
+
+Consider a fractional solution $x, \hat{y}$ such that $\hat{y}_C=y^*_C$ for $C\in\compl$, and 
+$\hat{y}_C=0$ for all $C\not\in\compl$. Then, $x, \hat{y}$ is a feasible solution to $LP_1^{(\ell)}$.
+Therefore, the lemma follows.
+\end{proof}
+
+For a set of components $D=\{C_1,\ldots,C_r\}\subseteq\compl$, define $\Gamma(D)=\bigcup_{C\in D} C$ to be the union of the sets $C$ in $D$, and let $y_D=\sum_{C\in D} y_C$.
+
+\begin{lemma}
+\textcolor{red}{Suppose $\einf(T^*, G)\geq \frac{2}{1-\epsilon}\log{n}$. Then, with high probability, there exists $\ell$ such that $OPT^{(\ell)}\geq 1$ and in the program $LP_1^{(\ell)}$, we have $\sum_{C\in\compl} y_C\geq 1$. **** NOT RIGHT}
+\end{lemma}
+\begin{proof}
+\textcolor{red}{By Lemma \ref{lemma:conc}, we have $\sinf(T^*, \G)\geq (1-\epsilon)\einf(T^*, G)$, with high probability. Since $\sum_{\ell} 2OPT^{(\ell)}\geq OPT=\sinf(\hat{T},\G)\geq\sinf(T^*,\G)$, there exists $\ell$ such that $OPT^{(\ell)}\geq 1$.}
+\end{proof}
+
+\begin{lemma}
+\label{lemma:supergrp}
+%Suppose $\einf(T^*, G)\geq \frac{2}{1-\epsilon}\log{n}$. 
+Suppose $OPT=\Omega(\log{n})$ and $\sum_{C\in\compl} y_C\geq 1$.
+Then, with high probability, it is possible to construct a partition $\mathcal{D}=\{D_1,\ldots,D_M\}$ of a subset of $\compl$ such that:
+(1) for all $D\in\mathcal{D}$, we have $y_D=\sum_{C\in D} y_C \in[1/2, 1]$,
+(2) $\sum_{D\in\mathcal{D}} y_D \geq \frac{1}{2}\sum_{C\in\compl} y_C$,
+(3) for all $S\subseteq V$ with $r\in S$, such that $\Gamma(D) \subseteq V-S$ for some $D\in\mathcal{D}$,
+we have $\sum_{e\in\delta(S)} x_e\geq 1/2$, 
+(4) $\sum_e x_e\leq k$, and
+(5) $2^{\ell}M\geq OPT/(2\log{n})$.
+\end{lemma}
+\begin{proof}
+Let $\compl=\{C_1,\ldots,C_{N_{\ell}}\}$. We arbitrarily partition $C_1,\ldots,C_{N_{\ell}}$ into $M+1\geq 2$ groups
+$$D_1=\{C_1,\ldots,C_{i_1},\}, D_2=\{C_{i_1+1},\ldots,C_{i_2}\},\cdots,D_M=\{C_{i_M-1},\ldots,C_{i_M}\}, D_{M+1}=\{C_{i_M+1},\ldots, C_{i_{N_{\ell}}}\}$$ 
+such that:
+$y_{D_j}=\sum_{C\in D_j} y_{C}\in[1/2, 1]$ for all $j=1,\ldots,M$, and $y_{D_{M+1}}< 1/2$ (note: group $M+1$ can be empty).
+
+We have $\sum_{j=1}^M y_{D_j}\geq \sum_{C\in\compl} y_C - y_{D_{M+1}} \geq \sum_{C\in\compl} y_C - 1/2 \geq \frac{1}{2}\sum_{C\in\compl} y_C$,
+since $\sum_{C\in\compl} y_C\geq 1$. 
+
+Consider any $S\subseteq V$ with $r\in S$, such that $\Gamma(D)\subseteq V-S$ for some $D\in\mathcal{D}$,
+we have 
+\[
+\sum_{e\in\delta(S)} x_e \geq \min\{1, \sum_{C\in\compl, C\subseteq V-S} y_C\}
+\geq \min\{1, \sum_{C\in D} y_C\}\geq 1/2
+\]
+Therefore, the lemma follows.
+\end{proof}
+
+\noindent
+\textbf{Our algorithm.}
+\begin{enumerate}
+\item
+Guess $\ell$, and find a fractional solution $x$ and a partition $D$ of $\compl$ such that
+(1) for all $S\subseteq V$ with $r\in S$, such that $\Gamma(D) \subseteq V-S$ for some $D\in\mathcal{D}$,
+we have $\sum_{e\in\delta(S)} x_e\geq 1/2$, 
+(2) $\sum_{D\in\mathcal{D}} y_D \geq \frac{1}{2}\sum_{C\in\compl} y_C$,
+(3) $\sum_e x_e\leq k$, and
+(4) $2^{\ell}M\geq OPT/(2\log{n})$.
+We refer to such a solution as a ``good'' solution
+\item
+Consider a group steiner tree problem on $G$ with a group $g_D=\cup_{C\in D} C$ corresponding to each 
+$D\in\mathcal{D}$; let $\mathcal{G}=\{g_D: D\in\mathcal{D}\}$ be the set of all groups.
+Construct tree $T$ by using the Garg et al. algorithm for rounding $x$
+\end{enumerate}
+
+\begin{lemma}
+The tree $T$ computed by the above rounding algorithm ensures that $|T|=O(k\log^c{n})$, and
+$\sum_{C\in\comp, C\cap T\neq\phi} |C|\geq OPT/(2\log{n})$, with high probability.
+\end{lemma}
+\begin{proof}
+The rounding algorithm of Garg et al. guarantees that (1) $|T|=O(k\log^c{n})$, and (2) for each $g_D$,
+there exists a node $v\in g_D$ such that $v\in T$.
+This implies, there exists $C\in D$ with $C\cap T\neq\phi$.
+Further, $|C|\in[2^{\ell}, 2^{\ell+1})$ for each $C\in D$.
+Therefore, we have 
+\[
+\sum_{C\cap T\neq\phi} |C| \geq \sum_{D\in\mathcal{D}} 2^{\ell}=M2^{\ell}\geq OPT/(2\log{n})
+\]
+\end{proof}
+
+\noindent
+\textbf{Finding a ``good'' solution.}
+We use the ellipsoid method. We solve $LP_1^{(\ell)}$ using the following separation oracle,
+which takes as input a fractional solution $x, y$ (with the constraint $\sum_{C\in\compl} |C|y_C\geq OPT/\log{n}$)
+\begin{enumerate}
+\item
+Check if the constraints $\sum_{C\in\compl} |C|y_C\geq OPT/\log{n}$ and $\sum_e x_e\leq k$ are violated.
+If so, return those.
+\item
+Partition the set $\compl$ into
+$$C_1,\ldots,C_{i_1},C_{i_1+1},\ldots,C_{i_2},\cdots,C_{i_M-1},\ldots,C_{i_M=N_{\ell}}$$ such that:
+$\sum_{j=i_p}^{i_{p+1}} y_{C_{i_j}}\in[1/2, 1]$ for all $p=0,\ldots,M-1$.
+\item
+For each $p=0,\ldots,M-1$, compute the total flow from $D_p=\cup_{j=i_p}^{i_{p+1}} C_{i_j}$ to the root $r$,
+using the $x_e$ values as capacities. If the total flow is less than 
+$\sum_{j=i_p}^{i_{p+1}} y_{C_{i_j}}$, the minimum cut $(V-S, S)$ gives a violated constraint
+\end{enumerate}
+
+
+\section{Submodular function maximization with connectivity constraints}
+
+\noindent
+\textbf{Problem.}
+Given a graph $G=(V, E)$, a non-negative monotone submodular function $f:V\rightarrow\mathbb{R}$, and a parameter $k$, the goal is to find a connected subset $S\subset V$ such that $|S|\leq k$, such that $f(S)$ is maximized.
+
+\begin{itemize}
+\item 
+The recursive greedy algorithm for the orienteering problem \cite{Chekuri:2005:RGA:1097112.1097461} gives an $O(\log{OPT})$ approximation in  $O(n^{O(\log{n})})$ time.
+\end{itemize}

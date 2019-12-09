@@ -1,0 +1,82 @@
+\documentclass[11pt]{article}
+\usepackage{fullpage} %[cm]
+\usepackage{lmodern} % enhanced version of computer modern
+\usepackage[T1]{fontenc} % for hyphenated characters
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{microtype}
+\usepackage{enumerate}
+\usepackage{ctable} % provides toprule, bottomrule, midrule
+%\usepackage[ruled,linesnumbered]{algorithm2e}
+\usepackage{url}
+\usepackage{amsthm}
+\usepackage{graphicx}
+\usepackage{subfig}
+\DeclareCaptionType{copyrightbox}
+\usepackage{color}
+\newcommand{\expect}{\mathrm{Exp}}
+\newcommand{\hide}[1]{}
+\newtheorem{theorem}{Theorem} % {\bfseries}{\itshape}
+\newtheorem{observation}{Observation} % {\bfseries}{\itshape}
+\newtheorem{lemma}{Lemma}{\bfseries}{\itshape}
+\newtheorem{problem}{Problem}
+%\newdef{claim}{Claim}
+%
+%\theoremstyle{definition}
+%\newtheorem{definition}[lemma]{Definition} % {\bfseries}{\itshape}
+%
+%\theoremstyle{remark}
+\newtheorem{claim}[lemma]{Claim} % {\bfseries}{\itshape}
+\newtheorem{conjecture}[lemma]{Conjecture} % {\bfseries}{\itshape}
+%
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\newcommand{\opt}{\mathrm{OPT}}
+\newcommand{\eopt}{E_{\mathrm{OPT}}}
+\newcommand{\edeg}{e_{\mathrm{deg}}}
+\newcommand{\prob}{\textsc{ConnInfMax}}
+\newcommand{\infmax}{\textsc{InfMax}}
+\newcommand{\einf}{\texttt{eInf}}
+\newcommand{\sinf}{\texttt{sinf}}
+\newcommand{\G}{\mathcal{G}}
+\renewcommand{\inf}{\texttt{inf}}
+
+\newcommand{\numinf}{\#\text{inf}}
+\newcommand{\kcsp}{k-\textsc{CSP}}
+\newcommand{\kcrp}{k-\textsc{CRP}}
+\newcommand{\crit}{\text{crit}}
+\newcommand{\degr}{\mathrm{d}}
+\newcommand{\Vol}{\mathrm{Vol}}
+\newcommand{\wmax}{w_{\max}}
+\newcommand{\eps}{\epsilon}
+\newcommand{\ceil}[1]{\left\lceil #1 \right\rceil}
+\DeclareMathOperator*{\nodes}{nodes}
+\DeclareMathOperator*{\walks}{walks}
+\DeclareMathOperator*{\ct}{count}
+\newcommand{\comp}{\texttt{comp}}
+\newcommand{\compl}{\texttt{comp}^{(\ell)}}
+\newcommand{\infl}{\texttt{Inf}}
+
+\title{Influence maximization with connectivity constraints}
+
+\author{}
+\date{}
+%
+\begin{document}
+\maketitle
+%
+\begin{abstract}
+The Influence Maximization problem formalizes the task of finding a small set of influential seed nodes in a social network, such that a targeted information campaign starting at the seed nodes reaches as many nodes in the network as possible. In practice, there are \emph{locality} restrictions that may make it unfeasible to choose any arbitrary set as the seed nodes. For example, $\ldots$. Here, we study the variant of influence maximization with connectivity constraints. The problem is NP-Hard. We propose an approximation algorithm for influence maximization with connectivity constraints. This algorithm reveals a relationship between Influence Maximization and the family of Steiner connectivity problems. We also propose a practical heuristic.
+\end{abstract}
+
+\input{introduction.tex}
+\input{related-work.tex}
+\input{preliminaries.tex}
+\input{proposed-methods.tex}
+\input{experiments.tex}
+\input{conclusions.tex}
+
+\bibliographystyle{plain}
+\bibliography{refs}
+\end{document}
+
